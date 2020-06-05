@@ -3,6 +3,7 @@ import sys
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO, stream=sys.stdout)
 logging.info("Starting...")
+import os
 import datetime
 from telegram.ext import Updater, CommandHandler, CallbackContext
 import apollodb
@@ -10,7 +11,10 @@ import apollo
 
 logging.info("Import finished, setting up functions...")
 
-updater = Updater(token='1***REMOVED***', use_context=True)
+bot_token = os.environ.get("BOT_TOKEN",None)
+if not bot_token:
+  logging.error("No bot token, exiting...")
+updater = Updater(token=bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
 def start(update, context):
