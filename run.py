@@ -13,7 +13,7 @@ logging.info("Import finished, setting up functions...")
 
 bot_token = os.environ.get("BOT_TOKEN",None)
 if not bot_token:
-  logging.error("No bot token, exiting...")
+    logging.error("No bot token, exiting...")
 updater = Updater(token=bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
