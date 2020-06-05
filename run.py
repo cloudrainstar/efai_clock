@@ -151,7 +151,7 @@ def callback_clockin(context: CallbackContext):
             if u.autolog:
                 context.bot.send_message(chat_id=u.userid, text="You have autolog enabled, I will now try to clock you in.")
                 msg = br.clock_in()
-                context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+                context.bot.send_message(chat_id=u.userid, text=msg)
         elif msg == "leave":
             context.bot.send_message(chat_id=u.userid, text="Good morning, I detected a leave notice today!")
             if u.autolog:
@@ -173,7 +173,7 @@ def callback_clockout(context: CallbackContext):
             if u.autolog:
                 context.bot.send_message(chat_id=u.userid, text="You have autolog enabled, I will now try to clock you out.")
                 msg = br.clock_out()
-                context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+                context.bot.send_message(chat_id=u.userid, text=msg)
         elif msg == "leave":
             context.bot.send_message(chat_id=u.userid, text="Good evening, I detected a leave notice today, but I'm still sending you a reminder to clock out!")
             if u.autolog:

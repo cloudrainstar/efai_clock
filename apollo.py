@@ -85,9 +85,10 @@ class ApolloSession:
                 myElem = WebDriverWait(self.browser, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'schedule-info__time')))
             except TimeoutException:
                 return "Error: Loading took too much time!"
-            day_of_week = datetime.datetime.today().weekday() + 1 % 7
-            first_day = datetime.datetime.today().replace(day=1)
-            dom = datetime.datetime.today().day
+            today = datetime.datetime.today() + datetime.timedelta(hours=8) # TAIPEI TIME
+            day_of_week = today.weekday() + 1 % 7
+            first_day = today.replace(day=1)
+            dom = today.day
             adjusted_dom = dom + first_day.weekday()
             week_of_month = int(ceil(adjusted_dom/7.0))
             els_table = self.browser.find_elements_by_tag_name("table")
