@@ -100,7 +100,7 @@ def autolog(update, context):
     else:
         ses = apollodb.UserQuery(apollodb.Session())
         u = ses.get_user(update.effective_chat.id)
-        if u: 
+        if u:
             if context.args[0] == "on":
                 context.bot.send_message(chat_id=update.effective_chat.id, text="I will automatically clock you in and out. Reminder is also enabled.")
                 ses.set_reminder(update.effective_chat.id, True)
@@ -163,6 +163,7 @@ def callback_clockin(context: CallbackContext):
     del br
     
 def callback_clockout(context: CallbackContext):
+    u = context.job.context
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
     if str(login_status) == "True":

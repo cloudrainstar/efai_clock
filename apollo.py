@@ -12,6 +12,8 @@ class ApolloSession:
     def __init__(self):
         opts = Options()
         opts.add_argument('--headless')
+        opts.add_argument('--no-sandbox')
+        opts.add_argument('--disable-dev-shm-usage')
         assert opts.headless  # Operating in headless mode
         self.browser = Chrome(options=opts)
         self.logged_in = False
