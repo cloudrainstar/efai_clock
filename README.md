@@ -1,6 +1,7 @@
 # efai_clock
 Connecting EFAI with Apollo XE through telegram bot.
 
+# sample run
 ```bash
 docker run -dt \
     -e PG_USER=<db_username> \
