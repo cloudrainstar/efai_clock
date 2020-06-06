@@ -1,3 +1,8 @@
+"""A telegram bot for Apollo HR XE.
+
+This module uses apollo.py to communicate with Apollo HR XE and
+uses apollodb.py for user management.
+"""
 import logging
 import sys
 import os
@@ -25,6 +30,7 @@ dispatcher = updater.dispatcher
 
 
 def start(update, context):
+    """Command handler: /start - displays help."""
     context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="""I can perform the following actions:
@@ -39,6 +45,7 @@ def start(update, context):
 
 
 def login(update, context):
+    """Command handler: /login <username> <password> - save login to database."""
     if len(context.args) != 2:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -67,6 +74,7 @@ def login(update, context):
 
 
 def info(update, context):
+    """Command handler: /info - check database info."""
     ses = apollodb.UserQuery(apollodb.Session())
     u = ses.get_user(update.effective_chat.id)
     if u:
@@ -82,6 +90,7 @@ def info(update, context):
 
 
 def clock(update, context):
+    """Command handler: /clock <in/out> - clock in or out."""
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -144,6 +153,7 @@ def clock(update, context):
 
 
 def reminder(update, context):
+    """Command handler: /reminder <on/off> - set clock reminder on or off."""
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -179,6 +189,7 @@ def reminder(update, context):
 
 
 def autolog(update, context):
+    """Command handler: /autolog <on/off> - set autolog on or off."""
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -214,6 +225,7 @@ def autolog(update, context):
 
 
 def delete(update, context):
+    """Command handler: /delete - delete all info."""
     ses = apollodb.UserQuery(apollodb.Session())
     u = ses.get_user(update.effective_chat.id)
     if u:
@@ -248,6 +260,7 @@ j = updater.job_queue
 
 
 def callback_clockin(context: CallbackContext):
+    """Handle callback: a clock-in callback using job queue."""
     u = context.job.context
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
@@ -281,6 +294,7 @@ def callback_clockin(context: CallbackContext):
 
 
 def callback_clockout(context: CallbackContext):
+    """Handle callback: a clock-out callback using job queue."""
     u = context.job.context
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
@@ -316,6 +330,7 @@ def callback_clockout(context: CallbackContext):
 
 
 def callback_reminder_clockin(context: CallbackContext):
+    """Handle callback: a clock-in reminder schedule using job queue."""
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:
@@ -323,6 +338,7 @@ def callback_reminder_clockin(context: CallbackContext):
 
 
 def callback_reminder_clockout(context: CallbackContext):
+    """Handle callback: a clock-out reminder schedule using job queue."""
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:

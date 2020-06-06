@@ -1,3 +1,8 @@
+"""A selenium module for clocking in and out.
+
+This module uses the selenium chrome webdriver to connect to
+Apollo HR XE clock system as of 2020/6/8.
+"""
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,11 +12,16 @@ from selenium.common.exceptions import TimeoutException
 import datetime
 from math import ceil
 
+URL_LOGIN = "https://auth.mayohr.com/HRM/Account/Login"
+URL_CLOCK = "https://hrm.mayohr.com/ta?id=webpunch"
 URL_SCHEDULE = "https://hrm.mayohr.com/ta/personal/shiftschedule"
 
 
 class ApolloSession:
+    """This class represents a single browser session."""
+
     def __init__(self):
+        """Start the webdriver session."""
         opts = Options()
         opts.add_argument("--headless")
         opts.add_argument("--no-sandbox")
@@ -21,16 +31,25 @@ class ApolloSession:
         self.logged_in = False
 
     def __enter__(self):
+        """Allow for usage using with."""
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """Allow for usage using with, cleaning up the browser session on exit."""
         self.browser.quit()
 
     def __del__(self):
+        """Clean up browser session on variable delete."""
         self.browser.quit()
 
     def login(self, user: str, pwd: str):
-        self.browser.get("https://auth.mayohr.com/HRM/Account/Login")
+        """Perform login.
+
+        Arguments:
+            user:str - username
+            pwd:str - password
+        """
+        self.browser.get(URL_LOGIN)
         delay = 10  # seconds
         try:
             _ = WebDriverWait(self.browser, delay).until(
@@ -54,8 +73,13 @@ class ApolloSession:
         return True
 
     def clock(self, clock_type):
+        """Perform clock-in. Requires login.
+
+        Arguments:
+            clock_type:str - "in" or "out", no other choices will work.
+        """
         if self.logged_in:
-            self.browser.get("https://hrm.mayohr.com/ta?id=webpunch")
+            self.browser.get(URL_CLOCK)
             delay = 10  # seconds
             try:
                 _ = WebDriverWait(self.browser, delay).until(
@@ -90,12 +114,15 @@ class ApolloSession:
         return "Error: not logged in."
 
     def clock_in(self):
+        """Alias to clock in."""
         return self.clock("in")
 
     def clock_out(self):
+        """Alias to clock out."""
         return self.clock("out")
 
     def work_day_query(self):
+        """Look up today's date on the schedule to see if it is a work day. Requires login."""
         if self.logged_in:
             self.browser.get(URL_SCHEDULE)
             delay = 10  # seconds

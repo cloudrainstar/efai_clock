@@ -1,3 +1,4 @@
+"""An sqlalchemy module for user management."""
 import os
 import sys
 from sqlalchemy import Column, Text, Boolean, BigInteger, create_engine
@@ -23,6 +24,8 @@ Session = sessionmaker(bind=engine)
 
 
 class User(Base):
+    """User table."""
+
     __tablename__ = "users"
 
     userid = Column(BigInteger, primary_key=True, nullable=False)
@@ -36,36 +39,47 @@ Base.metadata.create_all(engine)
 
 
 class UserQuery:
+    """User query helper class."""
+
     def __init__(self, session):
+        """Start new sqlalchemy session from Session()."""
         self.session = session
 
     def get_user(self, userid: int):
+        """Return a user from uiserid."""
         return self.session.query(User).filter_by(userid=userid).first()
 
     def get_reminder(self):
+        """Return all users that have reminder on."""
         return self.session.query(User).filter_by(reminder=True)
 
     def get_autolog(self):
+        """Return all users that have autolog on."""
         return self.session.query(User).filter_by(autolog=True)
 
     def add_user(self, user: User):
+        """Add a new user."""
         self.session.add(user)
         self.session.commit()
 
     def set_reminder(self, userid: int, newstate: bool):
+        """Turn on/off reminder for a user."""
         current_user = self.session.query(User).filter_by(userid=userid).first()
         current_user.reminder = newstate
         self.session.commit()
 
     def set_autolog(self, userid: int, newstate: bool):
+        """Turn on/off autolog for a user."""
         current_user = self.session.query(User).filter_by(userid=userid).first()
         current_user.autolog = newstate
         self.session.commit()
 
     def delete(self, userid: int):
+        """Delete a user."""
         current_user = self.session.query(User).filter_by(userid=userid).first()
         self.session.delete(current_user)
         self.session.commit()
 
     def close(self):
+        """Close a session."""
         self.session.close()
