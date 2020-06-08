@@ -137,7 +137,7 @@ class ApolloSession:
             today = datetime.datetime.today() + datetime.timedelta(
                 hours=8
             )  # TAIPEI TIME
-            day_of_week = today.weekday() + 1 % 7
+            day_of_week = (today.weekday() + 1) % 7
             first_day = today.replace(day=1)
             dom = today.day
             adjusted_dom = dom + first_day.weekday()
