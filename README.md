@@ -4,6 +4,15 @@ Connecting EFAI with Apollo XE through telegram bot. Feel free to send me PRs.
 # deployed bot
 http://t.me/efai_clock_bot
 
+Commands:
+- /start - show help message
+- /login <username> <password> - save your info to a database
+- /info - retrieve your current information
+- /clock <in/out> - clock in or out
+- /reminder <on/off> - turn on/off reminder
+- /autolog <on/off> - turn on/off auto clock in
+- /delete - delete everything about you from my database.
+
 # sample run
 ```bash
 docker run -dt \
@@ -22,3 +31,4 @@ docker run -dt \
 - detects "onleave" icon, but cannot identify the hours of leave
 - does not detect any other types of special attendance arrangements (e.g. business trips)
 - hard coded 8am to 5pm schedule with 07:15 reminder clockin and 17:00 reminder clockout
+- note: a random delay of 30 minutes is added, so your auto clockin will be from 07:15 to 07:45, while your clockout will be from 17:00 to 17:30

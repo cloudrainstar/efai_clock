@@ -7,6 +7,7 @@ import logging
 import sys
 import os
 import datetime
+import random
 from telegram.ext import Updater, CommandHandler, CallbackContext
 import apollodb
 import apollo
@@ -334,7 +335,8 @@ def callback_reminder_clockin(context: CallbackContext):
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:
-        context.job_queue.run_once(callback_clockin, 5, context=u)
+        max_half_hour_delay = random.randint(0,60*30)
+        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u)
 
 
 def callback_reminder_clockout(context: CallbackContext):
@@ -342,7 +344,8 @@ def callback_reminder_clockout(context: CallbackContext):
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:
-        context.job_queue.run_once(callback_clockout, 5, context=u)
+        max_half_hour_delay = random.randint(0,60*30)
+        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u)
 
 
 job_reminder_clockin = j.run_daily(
