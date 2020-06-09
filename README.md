@@ -30,5 +30,5 @@ docker run -dt \
 # caveats / known issues
 - detects "onleave" icon, but cannot identify the hours of leave
 - does not detect any other types of special attendance arrangements (e.g. business trips)
-- hard coded 8am to 5pm schedule with 07:15 reminder clockin and 17:00 reminder clockout
-- note: a random delay of 30 minutes is added, so your auto clockin will be from 07:15 to 07:45, while your clockout will be from 17:00 to 17:30
+- hard coded 8am to 5pm schedule with 07:29 reminder clockin and 17:01 reminder clockout
+- note: a random delay of 29 minutes is added, so your auto clockin will be from 07:29 to 07:58, while your clockout will be from 17:01 to 17:30

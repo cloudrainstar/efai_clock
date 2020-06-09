@@ -335,7 +335,7 @@ def callback_reminder_clockin(context: CallbackContext):
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:
-        max_half_hour_delay = random.randint(0,60*30)
+        max_half_hour_delay = random.randint(0,60*29)
         context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u)
 
 
@@ -344,16 +344,16 @@ def callback_reminder_clockout(context: CallbackContext):
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
     for u in us:
-        max_half_hour_delay = random.randint(0,60*30)
+        max_half_hour_delay = random.randint(0,60*29)
         context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u)
 
 
 job_reminder_clockin = j.run_daily(
-    callback_reminder_clockin, datetime.time(23, 15)
-)  # 7:15 TAIWAN
+    callback_reminder_clockin, datetime.time(23, 29)
+)  # 7:29 TAIWAN
 job_reminder_clockout = j.run_daily(
-    callback_reminder_clockout, datetime.time(9, 0)
-)  # 17:00 TAIWAN
+    callback_reminder_clockout, datetime.time(9, 1)
+)  # 17:01 TAIWAN
 
 logging.info("Started polling...")
 updater.start_polling()
