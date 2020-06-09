@@ -270,7 +270,7 @@ j = updater.job_queue
 def callback_clockin(context: CallbackContext):
     """Handle callback: a clock-in callback using job queue."""
     u = context.job.context
-    logging.info(f"CallbackClockin: {u.userid}")
+    logging.info(f"CallbackClockin: {str(u.userid)}")
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
     if str(login_status) == "True":
@@ -305,7 +305,7 @@ def callback_clockin(context: CallbackContext):
 def callback_clockout(context: CallbackContext):
     """Handle callback: a clock-out callback using job queue."""
     u = context.job.context
-    logging.info(f"CallbackClockout: {u.userid}")
+    logging.info(f"CallbackClockout: {str(u.userid)}")
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
     if str(login_status) == "True":
@@ -345,8 +345,8 @@ def callback_reminder_clockin(context: CallbackContext):
     us = ses.get_reminder()
     for u in us:
         max_half_hour_delay = random.randint(0,60*29)
-        logging.info(f"ClockInReminder: Adding a {str(max_half_hour_delay)} second delay for {u.userid}")
-        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u, name="clockin_"+u.userid)
+        logging.info(f"ClockInReminder: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}")
+        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u, name="clockin_"+str(u.userid))
 
 
 def callback_reminder_clockout(context: CallbackContext):
@@ -355,8 +355,8 @@ def callback_reminder_clockout(context: CallbackContext):
     us = ses.get_reminder()
     for u in us:
         max_half_hour_delay = random.randint(0,60*29)
-        logging.info(f"ClockOutReminder: Adding a {str(max_half_hour_delay)} second delay for {u.userid}")
-        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u, name="clockout_"+u.userid)
+        logging.info(f"ClockOutReminder: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}")
+        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u, name="clockout_"+str(u.userid))
 
 
 job_reminder_clockin = j.run_daily(
