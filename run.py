@@ -32,6 +32,7 @@ dispatcher = updater.dispatcher
 
 def start(update, context):
     """Command handler: /start - displays help."""
+    logging.info(f"Command: /start triggered by {update.effective_chat.id}")
     context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="""I can perform the following actions:
@@ -47,6 +48,7 @@ def start(update, context):
 
 def login(update, context):
     """Command handler: /login <username> <password> - save login to database."""
+    logging.info(f"Command: /login triggered by {update.effective_chat.id}")
     if len(context.args) != 2:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -76,6 +78,7 @@ def login(update, context):
 
 def info(update, context):
     """Command handler: /info - check database info."""
+    logging.info(f"Command: /info triggered by {update.effective_chat.id}")
     ses = apollodb.UserQuery(apollodb.Session())
     u = ses.get_user(update.effective_chat.id)
     if u:
@@ -92,6 +95,7 @@ def info(update, context):
 
 def clock(update, context):
     """Command handler: /clock <in/out> - clock in or out."""
+    logging.info(f"Command: /clock triggered by {update.effective_chat.id}")
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -155,6 +159,7 @@ def clock(update, context):
 
 def reminder(update, context):
     """Command handler: /reminder <on/off> - set clock reminder on or off."""
+    logging.info(f"Command: /reminder triggered by {update.effective_chat.id}")
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -191,6 +196,7 @@ def reminder(update, context):
 
 def autolog(update, context):
     """Command handler: /autolog <on/off> - set autolog on or off."""
+    logging.info(f"Command: /autolog triggered by {update.effective_chat.id}")
     if len(context.args) != 1:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -227,6 +233,7 @@ def autolog(update, context):
 
 def delete(update, context):
     """Command handler: /delete - delete all info."""
+    logging.info(f"Command: /delete triggered by {update.effective_chat.id}")
     ses = apollodb.UserQuery(apollodb.Session())
     u = ses.get_user(update.effective_chat.id)
     if u:
@@ -263,6 +270,7 @@ j = updater.job_queue
 def callback_clockin(context: CallbackContext):
     """Handle callback: a clock-in callback using job queue."""
     u = context.job.context
+    logging.info(f"CallbackClockin: {u.id}")
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
     if str(login_status) == "True":
@@ -297,6 +305,7 @@ def callback_clockin(context: CallbackContext):
 def callback_clockout(context: CallbackContext):
     """Handle callback: a clock-out callback using job queue."""
     u = context.job.context
+    logging.info(f"CallbackClockout: {u.id}")
     br = apollo.ApolloSession()
     login_status = br.login(u.apollo_user, u.apollo_password)
     if str(login_status) == "True":
@@ -336,7 +345,8 @@ def callback_reminder_clockin(context: CallbackContext):
     us = ses.get_reminder()
     for u in us:
         max_half_hour_delay = random.randint(0,60*29)
-        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u)
+        logging.info(f"ClockInReminder: Adding a {str(max_half_hour_delay)} second delay for {u.id}")
+        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u, name="clockin_"+u.id)
 
 
 def callback_reminder_clockout(context: CallbackContext):
@@ -345,7 +355,8 @@ def callback_reminder_clockout(context: CallbackContext):
     us = ses.get_reminder()
     for u in us:
         max_half_hour_delay = random.randint(0,60*29)
-        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u)
+        logging.info(f"ClockOutReminder: Adding a {str(max_half_hour_delay)} second delay for {u.id}")
+        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u, name="clockout_"+u.id)
 
 
 job_reminder_clockin = j.run_daily(
