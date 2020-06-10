@@ -343,9 +343,9 @@ def callback_reminder_clock(context: CallbackContext, out: bool = False):
         logging.info(
             f"{clock_string}: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}"
         )
-        callback_clock_function = partial(callback_clock(out=False))
+        callback_clock_function = partial(callback_clock, out=False)
         if out:
-            callback_clock_function = partial(callback_clock(out=True))
+            callback_clock_function = partial(callback_clock, out=True)
         context.job_queue.run_once(
             callback_clock_function,
             max_half_hour_delay,
@@ -355,10 +355,15 @@ def callback_reminder_clock(context: CallbackContext, out: bool = False):
 
 
 job_reminder_clockin = j.run_daily(
-    partial(callback_reminder_clock(out=False)), datetime.time(23, 29)
+    partial(callback_reminder_clock, out=False),
+    datetime.time(23, 29),
+    name="callback_reminder_clockin",
 )  # 7:29 TAIWAN
+
 job_reminder_clockout = j.run_daily(
-    partial(callback_reminder_clock(out=True)), datetime.time(9, 1)
+    partial(callback_reminder_clock, out=True),
+    datetime.time(9, 1),
+    name="callback_reminder_clockout",
 )  # 17:01 TAIWAN
 
 logging.info("Started polling...")
