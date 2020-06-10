@@ -8,6 +8,7 @@ import sys
 import os
 import datetime
 import random
+from functools import partial
 from telegram.ext import Updater, CommandHandler, CallbackContext
 import apollodb
 import apollo
@@ -267,103 +268,97 @@ dispatcher.add_handler(delete_handler)
 j = updater.job_queue
 
 
-def callback_clockin(context: CallbackContext):
-    """Handle callback: a clock-in callback using job queue."""
+def callback_clock(context: CallbackContext, out: bool = False):
+    """Handle callback: a clock in/out callback using job queue."""
     u = context.job.context
-    logging.info(f"CallbackClockin: {str(u.userid)}")
+    clock_string = "clockin_"
+    if out:
+        clock_string = "clockout_"
+    logging.info(f"{clock_string}: {str(u.userid)}")
     br = apollo.ApolloSession()
-    login_status = br.login(u.apollo_user, u.apollo_password)
-    if str(login_status) == "True":
-        msg = br.work_day_query()
-        if msg == "work":
-            context.bot.send_message(
-                chat_id=u.userid, text="Good morning, you have work today!"
-            )
-            if u.autolog:
+    retry_count = 3
+    for i in range(retry_count):
+        login_status = br.login(u.apollo_user, u.apollo_password)
+        if str(login_status) == "True":
+            msg = br.work_day_query()
+            if msg == "work":
+                logging.info(f"{clock_string}{str(u.userid)}: Detected Work Day")
+                work_detected_text = "Good morning, you have work today!"
+                if out:
+                    work_detected_text = "Good evening, nice work today!"
+                context.bot.send_message(
+                    chat_id=u.userid, text=work_detected_text,
+                )
+                if u.autolog:
+                    logging.info(f"{clock_string}{str(u.userid)}: Auto Login")
+                    context.bot.send_message(
+                        chat_id=u.userid,
+                        text=f"You have autolog enabled, I will now try to clock you {'out' if out else 'in'}.",
+                    )
+                    if out:
+                        clock_msg = br.clock_out()
+                    else:
+                        clock_msg = br.clock_in()
+                    logging.info(f"{clock_string}{str(u.userid)} Login:" + clock_msg)
+                    context.bot.send_message(chat_id=u.userid, text=clock_msg)
+            elif msg == "leave":
+                logging.info(f"{clock_string}{str(u.userid)}: Detected Leave Day")
                 context.bot.send_message(
                     chat_id=u.userid,
-                    text="You have autolog enabled, I will now try to clock you in.",
+                    text=f"Good evening, I detected a leave notice today, but I'm still sending you a reminder to clock {'out' if out else 'in'}!",
                 )
-                msg = br.clock_in()
-                context.bot.send_message(chat_id=u.userid, text=msg)
-        elif msg == "leave":
-            context.bot.send_message(
-                chat_id=u.userid, text="Good morning, I detected a leave notice today!"
-            )
-            if u.autolog:
-                context.bot.send_message(
-                    chat_id=u.userid,
-                    text="Since I can't tell your leave hours, you'll have to clock in manually!",
-                )
-        elif msg == "off":
-            pass
+                if u.autolog:
+                    context.bot.send_message(
+                        chat_id=u.userid,
+                        text=f"Since I can't tell your leave hours, you'll have to clock {'out' if out else 'in'} manually!",
+                    )
+            elif msg == "off":
+                logging.info(f"{clock_string}{str(u.userid)}: Detected Off Day")
+                pass
+            else:
+                logging.info(f"{clock_string}{str(u.userid)}: Detected " + msg)
+                pass
+            break
         else:
-            pass
+            logging.info(f"{clock_string}{str(u.userid)}: " + login_status)
+            if i == retry_count - 1:
+                context.bot.send_message(
+                    chat_id=u.userid,
+                    text=f"Login failed {retry_count} times.\n"
+                    + login_status
+                    + "\nPlease clock in/out manually.",
+                )
     del br
 
 
-def callback_clockout(context: CallbackContext):
-    """Handle callback: a clock-out callback using job queue."""
-    u = context.job.context
-    logging.info(f"CallbackClockout: {str(u.userid)}")
-    br = apollo.ApolloSession()
-    login_status = br.login(u.apollo_user, u.apollo_password)
-    if str(login_status) == "True":
-        msg = br.work_day_query()
-        if msg == "work":
-            context.bot.send_message(
-                chat_id=u.userid,
-                text="Good evening, nice work today, remember to clock out!",
-            )
-            if u.autolog:
-                context.bot.send_message(
-                    chat_id=u.userid,
-                    text="You have autolog enabled, I will now try to clock you out.",
-                )
-                msg = br.clock_out()
-                context.bot.send_message(chat_id=u.userid, text=msg)
-        elif msg == "leave":
-            context.bot.send_message(
-                chat_id=u.userid,
-                text="Good evening, I detected a leave notice today, but I'm still sending you a reminder to clock out!",
-            )
-            if u.autolog:
-                context.bot.send_message(
-                    chat_id=u.userid,
-                    text="Since I can't tell your leave hours, you'll have to clock out manually!",
-                )
-        elif msg == "off":
-            pass
-        else:
-            pass
-    del br
-
-
-def callback_reminder_clockin(context: CallbackContext):
-    """Handle callback: a clock-in reminder schedule using job queue."""
+def callback_reminder_clock(context: CallbackContext, out: bool = False):
+    """Handle callback: a clock in/out reminder schedule using job queue."""
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
+    clock_string = "clockin_"
+    if out:
+        clock_string = "clockout_"
     for u in us:
-        max_half_hour_delay = random.randint(0,60*29)
-        logging.info(f"ClockInReminder: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}")
-        context.job_queue.run_once(callback_clockin, max_half_hour_delay, context=u, name="clockin_"+str(u.userid))
-
-
-def callback_reminder_clockout(context: CallbackContext):
-    """Handle callback: a clock-out reminder schedule using job queue."""
-    ses = apollodb.UserQuery(apollodb.Session())
-    us = ses.get_reminder()
-    for u in us:
-        max_half_hour_delay = random.randint(0,60*29)
-        logging.info(f"ClockOutReminder: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}")
-        context.job_queue.run_once(callback_clockout, max_half_hour_delay, context=u, name="clockout_"+str(u.userid))
+        max_half_hour_delay = random.randint(0, 60 * 29)
+        logging.info(
+            f"{clock_string}: Adding a {str(max_half_hour_delay)} second delay for {str(u.userid)}"
+        )
+        callback_clock_function = partial(callback_clock(out=False))
+        if out:
+            callback_clock_function = partial(callback_clock(out=True))
+        context.job_queue.run_once(
+            callback_clock_function,
+            max_half_hour_delay,
+            context=u,
+            name=clock_string + str(u.userid),
+        )
 
 
 job_reminder_clockin = j.run_daily(
-    callback_reminder_clockin, datetime.time(23, 29)
+    partial(callback_reminder_clock(out=False)), datetime.time(23, 29)
 )  # 7:29 TAIWAN
 job_reminder_clockout = j.run_daily(
-    callback_reminder_clockout, datetime.time(9, 1)
+    partial(callback_reminder_clock(out=True)), datetime.time(9, 1)
 )  # 17:01 TAIWAN
 
 logging.info("Started polling...")
