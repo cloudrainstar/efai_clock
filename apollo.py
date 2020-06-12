@@ -50,7 +50,7 @@ class ApolloSession:
             pwd:str - password
         """
         self.browser.get(URL_LOGIN)
-        delay = 10  # seconds
+        delay = 30  # seconds
         try:
             _ = WebDriverWait(self.browser, delay).until(
                 EC.presence_of_element_located((By.NAME, "userName"))
@@ -80,7 +80,7 @@ class ApolloSession:
         """
         if self.logged_in:
             self.browser.get(URL_CLOCK)
-            delay = 10  # seconds
+            delay = 30  # seconds
             try:
                 _ = WebDriverWait(self.browser, delay).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "ta_btn_cancel"))
@@ -125,7 +125,7 @@ class ApolloSession:
         """Look up today's date on the schedule to see if it is a work day. Requires login."""
         if self.logged_in:
             self.browser.get(URL_SCHEDULE)
-            delay = 10  # seconds
+            delay = 30  # seconds
             try:
                 _ = WebDriverWait(self.browser, delay).until(
                     EC.presence_of_element_located(
