@@ -10,13 +10,12 @@ PG_PASSWORD = os.environ.get("PG_PASSWORD", None)
 PG_HOST = os.environ.get("PG_HOST", None)
 PG_PORT = os.environ.get("PG_PORT", "5432")
 PG_DB = os.environ.get("PG_DB", None)
+DB_URI = os.environ.get("DB_URI", None)
 
 # SQLAlchemy
 Base = declarative_base()
-if PG_USER and PG_PASSWORD and PG_HOST and PG_DB:
-    engine = create_engine(
-        f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
-    )
+if DB_URI:
+    engine = create_engine(DB_URI)
 else:
     raise Exception("DB information missing from environmental variables.")
     sys.exit(1)
