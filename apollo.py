@@ -13,8 +13,8 @@ import datetime
 from math import ceil
 
 URL_LOGIN = "https://auth.mayohr.com/HRM/Account/Login"
-URL_CLOCK = "https://hrm.mayohr.com/ta?id=webpunch"
-URL_SCHEDULE = "https://hrm.mayohr.com/ta/personal/shiftschedule"
+URL_CLOCK = "https://apolloxe.mayohr.com/ta?id=webpunch"
+URL_SCHEDULE = "https://apolloxe.mayohr.com/ta/personal/shiftschedule"
 
 
 class ApolloSession:
