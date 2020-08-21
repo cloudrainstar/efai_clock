@@ -1,9 +1,14 @@
 """An sqlalchemy module for user management."""
 import os
 import sys
+from time import sleep
+import logging
 from sqlalchemy import Column, Text, Boolean, BigInteger, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.exc import OperationalError, StatementError
+from sqlalchemy.orm.query import Query as _Query
+
 
 PG_USER = os.environ.get("PG_USER", None)
 PG_PASSWORD = os.environ.get("PG_PASSWORD", None)
@@ -12,14 +17,46 @@ PG_PORT = os.environ.get("PG_PORT", "5432")
 PG_DB = os.environ.get("PG_DB", None)
 DB_URI = os.environ.get("DB_URI", None)
 
+#https://stackoverflow.com/questions/53287215/retry-failed-sqlalchemy-queries/60614707#60614707
+class RetryingQuery(_Query):
+    """Retry query"""
+    __max_retry_count__ = 3
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __iter__(self):
+        attempts = 0
+        while True:
+            attempts += 1
+            try:
+                return super().__iter__()
+            except OperationalError as ex:
+                if "server closed the connection unexpectedly" not in str(ex):
+                    raise
+                if attempts <= self.__max_retry_count__:
+                    sleep_for = 2 ** (attempts - 1)
+                    logging.error(
+                        "Database connection error: retrying Strategy => sleeping for {}s"
+                        " and will retry (attempt #{} of {}) \n Detailed query impacted: {}".format(
+                        sleep_for, attempts, self.__max_retry_count__, ex)
+                )
+                    sleep(sleep_for)
+                    continue
+                else:
+                    raise
+            except StatementError as ex:
+                if "reconnect until invalid transaction is rolled back" not in str(ex):
+                    raise
+                self.session.rollback()
+
 # SQLAlchemy
 Base = declarative_base()
 if DB_URI:
     engine = create_engine(DB_URI)
 else:
     raise Exception("DB information missing from environmental variables.")
-    sys.exit(1)
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine, query_cls=RetryingQuery)
 
 
 class User(Base):
