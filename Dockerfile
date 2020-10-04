@@ -1,5 +1,8 @@
 FROM python:3.8-buster
 
+ENV TZ=Asia/Taipei
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN mkdir -p /opt/bot
 WORKDIR /opt/bot
 

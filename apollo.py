@@ -134,9 +134,7 @@ class ApolloSession:
                 )
             except TimeoutException:
                 return "Error: Loading took too much time!"
-            today = datetime.datetime.today() + datetime.timedelta(
-                hours=8
-            )  # TAIPEI TIME
+            today = datetime.datetime.today()
             day_of_week = (today.weekday() + 1) % 7
             first_day = today.replace(day=1)
             dom = today.day

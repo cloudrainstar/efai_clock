@@ -10,11 +10,6 @@ from sqlalchemy.exc import OperationalError, StatementError
 from sqlalchemy.orm.query import Query as _Query
 
 
-PG_USER = os.environ.get("PG_USER", None)
-PG_PASSWORD = os.environ.get("PG_PASSWORD", None)
-PG_HOST = os.environ.get("PG_HOST", None)
-PG_PORT = os.environ.get("PG_PORT", "5432")
-PG_DB = os.environ.get("PG_DB", None)
 DB_URI = os.environ.get("DB_URI", None)
 
 #https://stackoverflow.com/questions/53287215/retry-failed-sqlalchemy-queries/60614707#60614707
