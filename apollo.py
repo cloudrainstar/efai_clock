@@ -138,7 +138,7 @@ class ApolloSession:
             day_of_week = (today.weekday() + 1) % 7
             first_day = today.replace(day=1)
             dom = today.day
-            adjusted_dom = dom + first_day.weekday()
+            adjusted_dom = dom + ((first_day.weekday() + 1) % 7)
             week_of_month = int(ceil(adjusted_dom / 7.0))
             els_table = self.browser.find_elements_by_tag_name("table")
             els_tr = els_table[0].find_elements_by_tag_name("tr")
