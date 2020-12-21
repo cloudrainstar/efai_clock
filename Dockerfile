@@ -48,8 +48,11 @@ ENV DISPLAY=:99
 
 COPY requirements.txt /opt/bot/requirements.txt
 RUN pip install -r requirements.txt
+COPY alembic /opt/bot/alembic
 COPY apollo.py /opt/bot/apollo.py
 COPY apollodb.py /opt/bot/apollodb.py
 COPY run.py /opt/bot/run.py
+COPY alembic.ini /opt/bot/alembic.ini
+COPY start.sh /opt/bot/start.sh
 
-ENTRYPOINT ["python3", "run.py"]
+CMD ["/opt/bot/start.sh"]

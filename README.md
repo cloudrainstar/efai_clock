@@ -23,6 +23,15 @@ docker run -dt \
     cloudrainstar/efai_clock:latest
 ```
 
+# alembic
+Alembic has been added to this latest revision. For versions prior to tags, stamp head using 1.0.0.
+```bash
+docker run -it --rm \
+    -e DB_URI="sqlite://" \
+    cloudrainstar/efai_clock:1.0.0 \
+    alembic stamp head
+```
+
 # caveats / known issues
 - detects "onleave" icon, but cannot identify the hours of leave
 - does not detect any other types of special attendance arrangements (e.g. business trips)

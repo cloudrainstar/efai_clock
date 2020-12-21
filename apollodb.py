@@ -1,14 +1,14 @@
 """An sqlalchemy module for user management."""
+import logging
 import os
 import sys
 from time import sleep
-import logging
-from sqlalchemy import Column, Text, Boolean, BigInteger, create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import OperationalError, StatementError
-from sqlalchemy.orm.query import Query as _Query
 
+from sqlalchemy import BigInteger, Boolean, Column, Text, create_engine
+from sqlalchemy.exc import OperationalError, StatementError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.query import Query as _Query
 
 DB_URI = os.environ.get("DB_URI", None)
 

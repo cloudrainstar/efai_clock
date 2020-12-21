@@ -3,19 +3,27 @@
 This module uses the selenium chrome webdriver to connect to
 Apollo HR XE clock system as of 2020/6/8.
 """
+import datetime
+from enum import Enum
+from math import ceil
+from typing import NewType
+
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-import datetime
-from math import ceil
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 URL_LOGIN = "https://auth.mayohr.com/HRM/Account/Login"
 URL_CLOCK = "https://apolloxe.mayohr.com/ta?id=webpunch"
 URL_SCHEDULE = "https://apolloxe.mayohr.com/ta/personal/shiftschedule"
 
+class ClockType(Enum):
+    clock_in = "in"
+    clock_out = "out"
+
+IClockType = NewType('IClockType', ClockType)
 
 class ApolloSession:
     """This class represents a single browser session."""
@@ -72,7 +80,7 @@ class ApolloSession:
         self.logged_in = True
         return True
 
-    def clock(self, clock_type):
+    def clock(self, clock_type: IClockType):
         """Perform clock-in. Requires login.
 
         Arguments:
@@ -115,11 +123,11 @@ class ApolloSession:
 
     def clock_in(self):
         """Alias to clock in."""
-        return self.clock("in")
+        return self.clock(ClockType.clock_in)
 
     def clock_out(self):
         """Alias to clock out."""
-        return self.clock("out")
+        return self.clock(ClockType.clock_out)
 
     def work_day_query(self):
         """Look up today's date on the schedule to see if it is a work day. Requires login."""

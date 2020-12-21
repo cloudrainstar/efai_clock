@@ -3,16 +3,17 @@
 This module uses apollo.py to communicate with Apollo HR XE and
 uses apollodb.py for user management.
 """
-import logging
-import sys
-import os
 import datetime
+import logging
+import os
 import random
+import sys
 from functools import partial
-from telegram.ext import Updater, CommandHandler, CallbackContext
-import apollodb
-import apollo
 
+from telegram.ext import CallbackContext, CommandHandler, Updater
+
+import apollo
+import apollodb
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -268,7 +269,7 @@ dispatcher.add_handler(delete_handler)
 j = updater.job_queue
 
 
-def callback_clock(context: CallbackContext, out: bool = False):
+def callback_clock(context: CallbackContext, out: bool = False) -> None:
     """Handle callback: a clock in/out callback using job queue."""
     u = context.job.context
     clock_string = "clockin_"
@@ -331,7 +332,7 @@ def callback_clock(context: CallbackContext, out: bool = False):
     del br
 
 
-def callback_reminder_clock(context: CallbackContext, out: bool = False):
+def callback_reminder_clock(context: CallbackContext, out: bool = False) -> None:
     """Handle callback: a clock in/out reminder schedule using job queue."""
     ses = apollodb.UserQuery(apollodb.Session())
     us = ses.get_reminder()
