@@ -84,7 +84,7 @@ class ApolloSession:
         """Perform clock-in. Requires login.
 
         Arguments:
-            clock_type:str - "in" or "out", no other choices will work.
+            clock_type (IClockType) - clock_in or clock_out.
         """
         if self.logged_in:
             self.browser.get(URL_CLOCK)
@@ -97,8 +97,8 @@ class ApolloSession:
                 return "Error: Loading took too much time!"
             btns = self.browser.find_elements_by_class_name("ta_btn_cancel")
             first_btn = btns[0]
-            if ((first_btn.text == "on duty") and (clock_type == "in")) or (
-                (first_btn.text == "clock out") and (clock_type == "out")
+            if ((first_btn.text == "on duty") and (clock_type == ClockType.clock_in)) or (
+                (first_btn.text == "clock out") and (clock_type == ClockType.clock_out)
             ):
                 first_btn.click()
                 try:
@@ -109,16 +109,17 @@ class ApolloSession:
                     return "Error: Loading took too much time!"
                 els = self.browser.find_elements_by_tag_name("h4")
                 return els[0].text
-            if clock_type == "in":
+            if clock_type == ClockType.clock_in:
                 return (
                     "Error: on duty button not available! Current button text is "
                     + first_btn.text
                 )
-            if clock_type == "out":
+            if clock_type == ClockType.clock_out:
                 return (
                     "Error: clock out button not available! Current button text is "
                     + first_btn.text
                 )
+            return f"Error: button text is {str(first_btn.text)} and clock_type is {str(clock_type)}"
         return "Error: not logged in."
 
     def clock_in(self):
