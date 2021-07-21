@@ -70,7 +70,7 @@ class ApolloSession:
         username.send_keys(user)
         password.send_keys(pwd)
         submit = self.browser.find_element_by_class_name("submit-btn")
-        submit.submit()
+        submit.click()
         try:
             _ = WebDriverWait(self.browser, delay).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "user-menu__welcome"))
