@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "efai_clock"
+version = "0.1.0"
+description = ""
+authors = ["Ken Liao <cloudrainstar@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+requests = "2.24.0"
+selenium = "3.141.0"
+python-telegram-bot = "12.8"
+psycopg2-binary = "^2.9.1"
+SQLAlchemy = "^1.4.21"
+alembic = "^1.6.5"
+pydantic = "^1.8.2"
+
+[tool.poetry.dev-dependencies]
+black = "^21.7b0"
+isort = "^5.9.2"
+pydantic = "^1.8.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
