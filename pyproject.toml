@@ -6,7 +6,7 @@ authors = ["Ken Liao <cloudrainstar@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-requests = "2.24.0"
+requests = "2.31.0"
 selenium = "3.141.0"
 python-telegram-bot = "12.8"
 psycopg2-binary = "^2.9.1"
